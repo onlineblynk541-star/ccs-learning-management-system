@@ -1,18 +1,2 @@
-# Database configuration (IMPORTANT: Para hindi mag-leak ang password mo)
 db_connect.php
-
-# Database dumps/backups
 *.sql
-
-# PHP/Composer files
-vendor/
-composer.lock
-.phpunit.result.cache
-
-# Logs and OS files
-*.log
-.DS_Store
-Thumbs.db
-
-# Uploads folder (kung ayaw mong isama yung mga test images/files)
-uploads/
