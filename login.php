@@ -252,7 +252,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 
                 <div class="text-center mt-6">
-                    <a href="portal.php" class="text-slate-400 hover:text-jrmsuNavy text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
+                    <a href="index.php" class="text-slate-400 hover:text-jrmsuNavy text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
                         <i class="fas fa-chevron-left"></i> Return to Campus Gateway
                     </a>
                 </div>
