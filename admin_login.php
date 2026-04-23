@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         if (password_verify($password, $user['password'])) {
             // Password is correct!
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['full_name'];
+            $_SESSION['user_name'] = $user['name'];
             
             header("Location: admin_dashboard.php"); 
             exit();
