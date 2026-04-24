@@ -146,6 +146,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 // Handle Delete Teacher
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'delete_teacher') {
     $id = intval($_POST['id']);
+    
+    // --- ADDED CODE: Delete all modules created by this teacher ---
+    $stmt_modules = $conn->prepare("DELETE FROM modules WHERE instructor_id = ?");
+    if ($stmt_modules) {
+        $stmt_modules->bind_param("i", $id);
+        $stmt_modules->execute();
+        $stmt_modules->close();
+    }
+    // --------------------------------------------------------------
+
     $stmt = $conn->prepare("DELETE FROM instructor WHERE id = ?");
     if ($stmt) {
         $stmt->bind_param("i", $id);
