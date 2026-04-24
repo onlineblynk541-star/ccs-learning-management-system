@@ -3,7 +3,7 @@ session_start();
 include 'db_connect.php';
 
 // --- 1. HANDLE FORM SUBMISSIONS ---
-
+ 
 // Handle Add Student
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'add_student') {
     $name = $_POST['student_name'];
