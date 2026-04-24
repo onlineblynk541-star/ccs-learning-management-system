@@ -489,7 +489,7 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                 <div class="group">
                     <div class="certificate-frame p-8 sm:p-10 shadow-md text-center group-hover:shadow-xl transition-shadow">
                         <div class="mb-6">
-                            <h2 class="text-jrmsuNavy font-serif italic text-3xl font-bold mb-1">Certificate of Achievement</h2>
+                            <h2 class="text-jrmsuNavy font-serif italic text-3xl font-bold mb-1">Completely demonstrated</h2>
                             <p class="text-[10px] tracking-widest text-slate-400 font-bold uppercase">Jose Rizal Memorial State University</p>
                         </div>
                         <p class="text-sm italic text-slate-500 mb-2">This is to officially recognize that</p>
