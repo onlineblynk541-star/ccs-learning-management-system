@@ -1,11 +1,10 @@
 <?php
-// Ensure NO spaces, tabs, or newlines exist before the <?php tag above!
-session_start();
+session_start(); // 1. Start/Access the current session
 
-// Clear all session variables
+// 2. Clear all session variables
 $_SESSION = array();
 
-// Kill the session cookie
+// 3. If you want to kill the session cookie (optional but recommended)
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 42000,
@@ -14,10 +13,10 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Destroy the session
+// 4. Finally, destroy the session
 session_destroy();
 
-// Redirect
+// 5. Redirect the user back to the login page
 header("Location: admin_login.php");
 exit();
 ?>
