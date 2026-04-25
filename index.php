@@ -116,7 +116,7 @@
                     <p class="text-slate-500 text-sm text-center mb-8 leading-relaxed">
                         Manage class schedules, student grading, and faculty academic resources.
                     </p>
-                    <button onclick="navigateTo('teacher_login.php', this)" class="group relative w-full flex justify-center py-4 px-4 border border-transparent text-xs font-black rounded-2xl text-jrmsuNavy bg-jrmsuGold hover:bg-jrmsuGoldLight shadow-lg transition-all duration-300">
+                    <button onclick="navigateTo('instructor_login.php', this)" class="group relative w-full flex justify-center py-4 px-4 border border-transparent text-xs font-black rounded-2xl text-jrmsuNavy bg-jrmsuGold hover:bg-jrmsuGoldLight shadow-lg transition-all duration-300">
                         <span class="btnText flex items-center gap-2">
                             FACULTY LOGIN <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
                         </span>
