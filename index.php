@@ -77,7 +77,7 @@
             <h1 class="text-white text-4xl md:text-5xl font-black tracking-tight mb-2">
                 JRMSU <span class="text-jrmsuGold">PORTAL</span>
             </h1>
-            <p class="text-white/60 text-lg font-medium tracking-wide">College of Computer Studies Gateway</p>
+            <p class="text-white/60 text-lg font-medium tracking-wide">College of Computing Studies Gateway</p>
             <div class="h-1 w-20 bg-jrmsuGold mx-auto mt-4 rounded-full"></div>
         </div>
 
