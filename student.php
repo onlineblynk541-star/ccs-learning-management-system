@@ -74,6 +74,9 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
     <script src="tailwind-offline.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- HTML2PDF Library Integration -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -487,7 +490,7 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                 if ($passed_modules->num_rows > 0): while($cert = $passed_modules->fetch_assoc()):
                 ?>
                 <div class="group">
-                    <div class="certificate-frame p-8 sm:p-10 shadow-md text-center group-hover:shadow-xl transition-shadow">
+                    <div id="certificate-<?php echo $cert['id']; ?>" class="certificate-frame p-8 sm:p-10 shadow-md text-center group-hover:shadow-xl transition-shadow bg-white">
                         <div class="mb-6">
                             <h2 class="text-jrmsuNavy font-serif italic text-3xl font-bold mb-1">Completely demonstrated</h2>
                             <p class="text-[10px] tracking-widest text-slate-400 font-bold uppercase">Jose Rizal Memorial State University</p>
@@ -500,8 +503,8 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                         <i class="fas fa-award cert-seal text-8xl"></i>
                     </div>
                     <div class="text-center mt-5">
-                        <button onclick="window.print()" class="text-xs font-bold text-slate-500 hover:text-jrmsuNavy transition-all uppercase tracking-widest bg-white border border-slate-200 px-4 py-2 rounded-lg shadow-sm hover:shadow">
-                            <i class="fas fa-print mr-2 text-jrmsuGold"></i> Print PDF
+                        <button onclick="downloadCertificate('certificate-<?php echo $cert['id']; ?>', '<?php echo htmlspecialchars(addslashes($cert['title'])); ?>')" class="text-xs font-bold text-slate-500 hover:text-jrmsuNavy transition-all uppercase tracking-widest bg-white border border-slate-200 px-4 py-2 rounded-lg shadow-sm hover:shadow">
+                            <i class="fas fa-download mr-2 text-jrmsuGold"></i> Download PDF
                         </button>
                     </div>
                 </div>
@@ -596,6 +599,23 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
 </div>
 
 <script>
+    // Certificate PDF Download Logic
+    function downloadCertificate(elementId, title) {
+        const element = document.getElementById(elementId);
+        
+        // Setup PDF Options
+        const opt = {
+            margin:       0.5,
+            filename:     title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_certificate.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+        };
+
+        // Generate and save PDF
+        html2pdf().set(opt).from(element).save();
+    }
+
     // Tab Navigation Logic
     const navButtons = document.querySelectorAll('.nav-btn');
     const tabContents = document.querySelectorAll('.tab-content');
