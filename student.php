@@ -492,12 +492,12 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                 <div class="group">
                     <div id="certificate-<?php echo $cert['id']; ?>" class="certificate-frame p-8 sm:p-10 shadow-md text-center group-hover:shadow-xl transition-shadow bg-white">
                         <div class="mb-6">
-                            <h2 class="text-jrmsuNavy font-serif italic text-3xl font-bold mb-1">Completely demonstrated</h2>
+                            <h2 class="text-jrmsuNavy font-serif italic text-3xl font-bold mb-1">Certificate of Completion</h2>
                             <p class="text-[10px] tracking-widest text-slate-400 font-bold uppercase">Jose Rizal Memorial State University</p>
                         </div>
                         <p class="text-sm italic text-slate-500 mb-2">This is to officially recognize that</p>
                         <h3 class="text-jrmsuGold text-2xl font-black uppercase underline mb-4 decoration-jrmsuGold/30 underline-offset-8"><?php echo $s_name; ?></h3>
-                        <p class="text-sm italic text-slate-500 mb-2">has successfully demonstrated mastery in</p>
+                        <p class="text-sm italic text-slate-500 mb-2">Has successfully completed all requirements of the comprehensive online course in:</p>
                         <h4 class="text-jrmsuNavy font-bold text-lg mb-8"><?php echo htmlspecialchars($cert['title']); ?></h4>
                         <p class="text-xs font-bold text-slate-500 border-t border-slate-200 pt-4 inline-block px-8">GRANTED ON <?php echo strtoupper(date("F d, Y", strtotime($cert['date_taken']))); ?></p>
                         <i class="fas fa-award cert-seal text-8xl"></i>
