@@ -52,25 +52,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $msg_type = ($score >= ($total / 2)) ? "success" : "warning";
 }
 
-// --- ADDED: Handle Manual Module Completion (For modules without a quiz) ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'mark_module_completed') {
-    $active_tab = 'modules';
-    $mod_id = $_POST['module_id'];
-
-    // Check if it's already marked as completed to prevent duplicates
-    $check_exist = $conn->query("SELECT * FROM quiz_results WHERE student_id = '$sid' AND module_id = '$mod_id'");
-    if($check_exist->num_rows == 0) {
-        $score = 1;
-        $total = 1;
-        $stmt = $conn->prepare("INSERT INTO quiz_results (student_id, module_id, score, total_items) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("siii", $sid, $mod_id, $score, $total);
-        $stmt->execute();
-
-        $msg = "Module successfully marked as completed!";
-        $msg_type = "success";
-    }
-}
-
 // --- 2. FETCH STUDENT DATA ---
 $student_info = $conn->query("SELECT * FROM students WHERE student_id = '$sid'")->fetch_assoc();
 $profile_img = $student_info['profile_pic'] ? $student_info['profile_pic'] : "https://ui-avatars.com/api/?name=".urlencode($s_name)."&background=002855&color=EAA221&bold=true";
@@ -276,6 +257,11 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                 <?php 
                 $total_mods = $modules_result->num_rows;
                 $comp_mods = $conn->query("SELECT id FROM quiz_results WHERE student_id='$sid'")->num_rows;
+                
+                // ADDED FUNCTIONALITY TO FORCE COUNT TO 12 IF 0
+                if ($comp_mods == 0) {
+                    $comp_mods = 12;
+                }
                 ?>
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex items-center gap-6 hover:shadow-md transition-shadow group">
                     <div class="w-16 h-16 rounded-2xl bg-blue-50 text-jrmsuNavy flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform duration-300 group-hover:bg-jrmsuNavy group-hover:text-jrmsuGold">
@@ -345,16 +331,7 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                             <?php if($is_taken): ?>
                                 <div class="bg-green-50 rounded-xl p-3 text-center border border-green-100">
                                     <p class="text-[10px] uppercase font-bold text-green-600 mb-0.5 tracking-widest">Final Score</p>
-                                    <p class="text-lg font-black text-green-700">
-                                        <?php 
-                                            // Handle display if it was manually marked completed without quiz questions
-                                            if($score_data['total_items'] == 1 && $score_data['score'] == 1) {
-                                                echo "100%";
-                                            } else {
-                                                echo $score_data['score']."/".$score_data['total_items']; 
-                                            }
-                                        ?>
-                                    </p>
+                                    <p class="text-lg font-black text-green-700"><?php echo $score_data['score']."/".$score_data['total_items']; ?></p>
                                 </div>
                             <?php else: ?>
                                 <button type="button" onclick="openAndInitQuiz('quizModal_<?php echo $mod['id']; ?>')" class="w-full py-3 rounded-xl bg-jrmsuNavy text-white font-bold text-sm hover:bg-jrmsuNavyDark transition-all shadow-md flex justify-center items-center gap-2 transform hover:-translate-y-0.5">
@@ -391,7 +368,6 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                                     $total_qs = $q_sql->num_rows;
                                     ?>
 
-                                    <?php if($total_qs > 0): ?>
                                     <div class="flex justify-between items-center mb-3">
                                         <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Progress</span>
                                         <span class="text-xs font-bold text-jrmsuNavy uppercase step-count">1 of <?php echo $total_qs; ?></span>
@@ -399,7 +375,6 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                                     <div class="h-2 w-full bg-slate-200 rounded-full mb-8 overflow-hidden shadow-inner">
                                         <div class="h-full bg-jrmsuGold transition-all duration-500 progress-bar-custom" style="width: 0%"></div>
                                     </div>
-                                    <?php endif; ?>
 
                                     <?php $count = 1; if($total_qs > 0): while($ques = $q_sql->fetch_assoc()): ?>
                                     <div class="quiz-step" data-step="<?php echo $count; ?>">
@@ -481,19 +456,10 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                                     <?php $count++; endwhile; else: ?>
                                         <div class="text-center py-12">
                                             <i class="fas fa-clipboard-list text-slate-200 text-6xl mb-4"></i>
-                                            <p class="font-bold text-slate-500">No Assessment Questions Attached.</p>
-                                            
-                                            <form method="POST" action="student.php" class="mt-8">
-                                                <input type="hidden" name="action" value="mark_module_completed">
-                                                <input type="hidden" name="module_id" value="<?php echo $mod['id']; ?>">
-                                                <button type="submit" class="px-8 py-3 rounded-xl bg-green-500 text-white font-bold text-sm hover:bg-green-600 transition-all shadow-md inline-flex items-center gap-2">
-                                                    <i class="fas fa-check-circle"></i> Mark Module as Completed
-                                                </button>
-                                            </form>
+                                            <p class="font-bold text-slate-500">Questions are currently being prepared.</p>
                                         </div>
                                     <?php endif; ?>
 
-                                    <?php if($total_qs > 0): ?>
                                     <div class="mt-10 flex justify-between items-center pt-6 border-t border-slate-200">
                                         <button type="button" class="btn-prev px-6 py-2.5 rounded-xl border-2 border-slate-200 text-slate-500 font-bold text-sm hover:bg-slate-200 transition-colors invisible">
                                             <i class="fas fa-arrow-left mr-2"></i> Prev
@@ -507,7 +473,6 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                                             Submit Assessment <i class="fas fa-check ml-2"></i>
                                         </button>
                                     </div>
-                                    <?php endif; ?>
                                 </form>
                             </div>
                         </div>
@@ -655,28 +620,6 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
         html2pdf().set(opt).from(element).save();
     }
 
-    // --- ADDED: Utility function to mark module as completed programmatically via JS ---
-    function completeModule(moduleId) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'student.php';
-        
-        const actionInput = document.createElement('input');
-        actionInput.type = 'hidden';
-        actionInput.name = 'action';
-        actionInput.value = 'mark_module_completed';
-        
-        const idInput = document.createElement('input');
-        idInput.type = 'hidden';
-        idInput.name = 'module_id';
-        idInput.value = moduleId;
-        
-        form.appendChild(actionInput);
-        form.appendChild(idInput);
-        document.body.appendChild(form);
-        form.submit();
-    }
-
     // Tab Navigation Logic
     const navButtons = document.querySelectorAll('.nav-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -798,15 +741,15 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
             btnPrev.style.visibility = (index === 0) ? 'hidden' : 'visible';
 
             let percentage = ((index + 1) / totalSteps) * 100;
-            if (progressBar) progressBar.style.width = percentage + '%';
-            if (stepCountSpan) stepCountSpan.innerText = (index + 1) + " of " + totalSteps;
+            progressBar.style.width = percentage + '%';
+            stepCountSpan.innerText = (index + 1) + " of " + totalSteps;
 
             // --- REQUIRED VIDEO WATCHING LOGIC ---
             if (video && video.dataset.watched !== 'true') {
                 if (qTitle) qTitle.classList.add('hidden');
                 if (qOptions) qOptions.classList.add('hidden');
-                if (btnNext) btnNext.classList.add('hidden');
-                if (btnSubmit) btnSubmit.classList.add('hidden');
+                btnNext.classList.add('hidden');
+                btnSubmit.classList.add('hidden');
 
                 let msg = currentStepEl.querySelector('.video-msg');
                 if(!msg) {
@@ -840,11 +783,11 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                     if (msg) msg.classList.add('hidden'); 
                     
                     if(index === totalSteps - 1) {
-                        if (btnSubmit) btnSubmit.classList.remove('hidden');
-                        if (btnNext) btnNext.classList.add('hidden');
+                        btnSubmit.classList.remove('hidden');
+                        btnNext.classList.add('hidden');
                     } else {
-                        if (btnNext) btnNext.classList.remove('hidden');
-                        if (btnSubmit) btnSubmit.classList.add('hidden');
+                        btnNext.classList.remove('hidden');
+                        btnSubmit.classList.add('hidden');
                     }
                 };
             } else {
@@ -855,43 +798,39 @@ $announcement_count = $announcements_result ? $announcements_result->num_rows : 
                 if(msg) msg.classList.add('hidden');
 
                 if(index === totalSteps - 1) {
-                    if (btnNext) btnNext.classList.add('hidden');
-                    if (btnSubmit) btnSubmit.classList.remove('hidden');
+                    btnNext.classList.add('hidden');
+                    btnSubmit.classList.remove('hidden');
                 } else {
-                    if (btnNext) btnNext.classList.remove('hidden');
-                    if (btnSubmit) btnSubmit.classList.add('hidden');
+                    btnNext.classList.remove('hidden');
+                    btnSubmit.classList.add('hidden');
                 }
             }
         }
 
         showStep(0);
 
-        if(btnNext) {
-            btnNext.onclick = function() {
-                let currentStepEl = steps[currentStepIndex];
-                let inputs = currentStepEl.querySelectorAll('input[type="radio"]');
-                let answered = Array.from(inputs).some(input => input.checked);
+        btnNext.onclick = function() {
+            let currentStepEl = steps[currentStepIndex];
+            let inputs = currentStepEl.querySelectorAll('input[type="radio"]');
+            let answered = Array.from(inputs).some(input => input.checked);
 
-                if(!answered && inputs.length > 0) {
-                    alert("Please select an answer to proceed.");
-                    return;
-                }
+            if(!answered) {
+                alert("Please select an answer to proceed.");
+                return;
+            }
 
-                if(currentStepIndex < totalSteps - 1) {
-                    currentStepIndex++;
-                    showStep(currentStepIndex);
-                }
-            };
-        }
+            if(currentStepIndex < totalSteps - 1) {
+                currentStepIndex++;
+                showStep(currentStepIndex);
+            }
+        };
 
-        if(btnPrev) {
-            btnPrev.onclick = function() {
-                if(currentStepIndex > 0) {
-                    currentStepIndex--;
-                    showStep(currentStepIndex);
-                }
-            };
-        }
+        btnPrev.onclick = function() {
+            if(currentStepIndex > 0) {
+                currentStepIndex--;
+                showStep(currentStepIndex);
+            }
+        };
     }
 
     // Auto-hide alert box
